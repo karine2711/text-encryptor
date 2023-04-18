@@ -35,7 +35,7 @@ function extendedGCD(a, b) {
   return [g, y, x - a / b * y];
 }
 
-function generateKeys(bits = 256) {
+function generateKeys(bits = 1024) {
   const p = crypto.generatePrimeSync(bits, { bigint: true });
   const q = crypto.generatePrimeSync(bits, { bigint: true });
   const n = p * q;
@@ -44,7 +44,7 @@ function generateKeys(bits = 256) {
   while (gcd(e, phi) !== 1n) {
     e += 2n;
   }
-  const d = modInverse(e, phi);
+  const d = modInverse(e, phi); // (e * d) % phi = 1
   return {
     publicKey: { e, n },
     privateKey: { d, n },
@@ -54,14 +54,14 @@ function generateKeys(bits = 256) {
 function encrypt(message, publicKey) {
   const { e, n } = publicKey;
   const m = BigInt("0x" + Buffer.from(message).toString("hex"));
-  const c = modPow(m, e, n);
+  const c = modPow(m, e, n); //  m^e % n
   return c.toString(16);
 }
 
 function decrypt(ciphertext, privateKey) {
   const { d, n } = privateKey;
   const c = BigInt("0x" + ciphertext);
-  const m = modPow(c, d, n);
+  const m = modPow(c, d, n); // c^d % n
   const message = Buffer.from(m.toString(16), "hex").toString();
   return message;
 }
