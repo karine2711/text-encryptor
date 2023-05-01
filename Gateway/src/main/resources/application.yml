@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: aes_route
+          uri: http://localhost:8081/aes/
+          predicates:
+            - Path=/aes/**
+        - id: ecc_route
+          uri: http://localhost:8081/ecc/
+          predicates:
+            - Path=/ecc/**
+        - id: aes_route
+          uri: http://localhost:8081/caesar/
+          predicates:
+            - Path=/caesar/**
+        - id: aes_route
+          uri: http://localhost:3000/rsa/
+          predicates:
+            - Path=/rsa/**
+        - id: aes_route
+          uri: http://localhost:3000/blowfish/
+          predicates:
+            - Path=/blowfish/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
