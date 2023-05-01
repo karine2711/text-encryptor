@@ -171,9 +171,6 @@ function decrypt(string) {
   let decryptedString = '';
   for (let i = 0; i < blocks; i++) {
     let block = string.substr(i * 8, 8);
-    if (block.length < 8) {
-      throw new Error('Зашифрованная строка повреждена: длинна зашифрованной строки должна быть кратна 8 баыйтам.');
-    }
     let xL, xR, xLxR;
 
     xLxR = split64by32(block);
@@ -375,6 +372,7 @@ function trimZeros(input) {
 
 const key = 'uwicb73Jbh83!!$537fvvj73&&821';
 generateSubkeys(key);
+console.log(pArray)
 let encrypted = encrypt('secret message');
 console.log(encrypted);
 let decrypted = decrypt(encrypted);
