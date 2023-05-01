@@ -4,17 +4,16 @@ import com.cybersec.encryptor.textencryptor.impl.aes.Matrices.Sbox;
 import java.util.Arrays;
 
 public class KeyScheduler {
-    private byte[] key;
+    private final byte[] key;
     private final byte[] part1;
-    private byte[] part2;
-    private byte[] part3;
-    private byte[] part4;
-    private byte[][] parts;
+    private final byte[] part2;
+    private final byte[] part3;
+    private final byte[] part4;
+    private final byte[][] parts;
     private int constant = 1;
 
     KeyScheduler(byte[] key) {
         this.key = key;
-        var halfLength = this.key.length / 2;
         var quarterLength = this.key.length / 4;
         part1 = new byte[quarterLength];
         part2 = new byte[quarterLength];

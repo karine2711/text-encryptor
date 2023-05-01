@@ -1,4 +1,4 @@
-package com.cybersec.encryptor.textencryptor.impl;
+package com.cybersec.encryptor.textencryptor.impl.aes;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

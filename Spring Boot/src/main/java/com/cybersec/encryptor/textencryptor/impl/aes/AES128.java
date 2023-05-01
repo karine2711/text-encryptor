@@ -7,14 +7,15 @@ import com.cybersec.encryptor.textencryptor.impl.aes.Matrices.Sbox;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AES {
+public class AES128 {
     AESChunkEncryptor chunkEncryptor;
     List<byte[][]> keys = new ArrayList<>();
 
-    public AES(byte[] masterKey) {
+    public AES128(byte[] masterKey) {
         this.chunkEncryptor = new AESChunkEncryptor(keys);
         KeyScheduler scheduler = new KeyScheduler(masterKey);
         keys.add(constructStateMatrix(masterKey));
@@ -23,53 +24,49 @@ public class AES {
         }
     }
 
-    public synchronized byte[] encrypt(String text) {
+    public synchronized String encrypt(String text) {
         List<byte[][]> states = chunkString(text.getBytes(StandardCharsets.UTF_8))
             .stream()
             .map(Matrices::constructStateMatrix)
             .collect(Collectors.toList());
-//        List<byte[][]> states = new ArrayList<>();
-//        states.add(new byte[][] {
-//            {1, 2, 3, 4},
-//            {5, 6, 7, 8},
-//            {9, 10, 11, 12},
-//            {13, 14, 15, 15}
-//        });
-//        StringBuilder builder = new StringBuilder();
-//        states.forEach(matrix -> builder.append(chunkEncryptor.encrypt(matrix)));
-//        return builder.toString();
         List<byte[]> encrypted = new ArrayList<>();
         states.forEach(s -> encrypted.add(chunkEncryptor.encrypt(s)));
-        // Copy the bytes from each byte array to the result array
         byte[] result = new byte[encrypted.size() * 16];
         int offset = 0;
         for (byte[] bytes : encrypted) {
             System.arraycopy(bytes, 0, result, offset, bytes.length);
             offset += bytes.length;
         }
-        return result;
+        return Base64.getEncoder().encodeToString(result);
     }
 
-    public synchronized String decrypt(byte[] cypertext) {
-        List<byte[][]> states = chunkString(cypertext)
+    public synchronized String decrypt(String cypertext) {
+        List<byte[][]> states = chunkString(Base64.getDecoder().decode(cypertext))
             .stream()
             .map(Matrices::constructStateMatrix).collect(Collectors.toList());
-//        StringBuilder builder = new StringBuilder();
-//        states.forEach(matrix -> builder.append(chunkEncryptor.decrypt(matrix)));
-//        return builder.toString();
         List<byte[]> decrypted = new ArrayList<>();
         states.forEach(s -> decrypted.add(chunkEncryptor.decrypt(s)));
-        // Copy the bytes from each byte array to the result array
         byte[] result = new byte[decrypted.size() * 16];
         int offset = 0;
         for (byte[] bytes : decrypted) {
             System.arraycopy(bytes, 0, result, offset, bytes.length);
             offset += bytes.length;
         }
-        return new String(result,StandardCharsets.UTF_8);
+        result = getWithoutPadding(result);
+        return new String(result, StandardCharsets.UTF_8);
     }
 
-
+    private byte[] getWithoutPadding(byte[] result) {
+        var i = result.length - 1;
+        var lastByte = result[i];
+        i--;
+        while (result[i] == lastByte) {
+            i--;
+        }
+        byte[] unPadded = new byte[i + 1];
+         System.arraycopy(result, 0, unPadded, 0, i + 1);
+         return unPadded;
+    }
 
     public static List<byte[]> chunkString(byte[] byteArray) {
         List<byte[]> chunks = new ArrayList<>();
@@ -85,19 +82,15 @@ public class AES {
         }
         return chunks;
     }
-
 }
 
 class AESChunkEncryptor {
     List<byte[][]> keys = new ArrayList<>();
 
-    //TODO: Make customizable key size
     public AESChunkEncryptor(List<byte[][]> keys) {
         this.keys = keys;
     }
 
-
-    //TODO: Add parallel processing
     public byte[] encrypt(byte[][] textChunk) {
         doEncryptRound(textChunk, 0, 0);
         int rows = textChunk.length;
@@ -109,21 +102,12 @@ class AESChunkEncryptor {
                 vector[k++] = textChunk[i][j];
             }
         }
-
         return vector;
     }
 
 
-    //TODO: Add parallel processing
     public byte[] decrypt(byte[][] cyperChunk) {
         doDecryptRound(cyperChunk, keys.size() - 1, 0);
-//        StringBuilder builder = new StringBuilder();
-//        for (int i = 0; i < cyperChunk.length; i++) {
-//            for (int j = 0; j < cyperChunk.length; j++) {
-//                builder.append((char) (cyperChunk[i][j] & 0xFF));
-//            }
-//        }
-
         return getFlat(cyperChunk);
     }
 
@@ -133,7 +117,6 @@ class AESChunkEncryptor {
         }
         if (round == 0) {
             xorWithKey(state, keys.get(keyIndex));
-            System.out.println("Encrypt State 1: " + Arrays.deepToString(state));
             doEncryptRound(state, keyIndex + 1, round + 1);
             return;
         }
@@ -143,9 +126,7 @@ class AESChunkEncryptor {
         if (round != 10) {
             ColumnMix.mix(state);
         }
-        System.out.println("Before XOR State" + round + ": " + Arrays.deepToString(state));
         xorWithKey(state, key);
-        System.out.println("Encrypt State" + round + ": " + Arrays.deepToString(state));
         doEncryptRound(state, keyIndex + 1, round + 1);
     }
 
@@ -155,7 +136,6 @@ class AESChunkEncryptor {
         }
         if (round == 0) {
             xorWithKey(state, keys.get(keyIndex));
-            System.out.println("Decrypt State" + round + ": " + Arrays.deepToString(state));
             doDecryptRound(state, keyIndex - 1, round + 1);
             return;
         }
@@ -166,7 +146,6 @@ class AESChunkEncryptor {
         shiftRowsRight(state);
         Sbox.inplaceInverseSubstitute(state);
         xorWithKey(state, key);
-        System.out.println("Decrypt State" + round + ": " + Arrays.deepToString(state));
         doDecryptRound(state, keyIndex - 1, round + 1);
     }
 
@@ -213,9 +192,9 @@ class AESChunkEncryptor {
         int cols = matrix[0].length;
         byte[] vector = new byte[rows * cols];
         int k = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                vector[k++] = matrix[i][j];
+        for (byte[] bytes : matrix) {
+            for (byte b : bytes) {
+                vector[k++] = b;
             }
         }
         return vector;
