@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.cybersec.encryptor.textencryptor.excpetion.AlgorithmInstantiationException;
+import com.cybersec.encryptor.textencryptor.impl.caesar.Caesar;
 import org.junit.jupiter.api.Test;
 
 class CaesarTest {

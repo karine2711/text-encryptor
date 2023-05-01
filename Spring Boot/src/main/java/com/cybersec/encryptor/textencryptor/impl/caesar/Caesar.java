@@ -1,4 +1,4 @@
-package com.cybersec.encryptor.textencryptor.impl;
+package com.cybersec.encryptor.textencryptor.impl.caesar;
 
 import com.cybersec.encryptor.textencryptor.excpetion.AlgorithmInstantiationException;
 
