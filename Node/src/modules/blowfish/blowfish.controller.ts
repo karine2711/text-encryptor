@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { MessageDto } from '../../dtos/message.dto';
 import { BlowfishService } from './blowfish.service';
 
@@ -6,21 +6,13 @@ import { BlowfishService } from './blowfish.service';
 export class BlowfishController {
   constructor(private readonly blowFishService: BlowfishService) {}
 
-  @Get('encrypt')
-  encryptBlowfish(@Query() { message }: MessageDto): string {
+  @Post('encrypt')
+  encryptBlowfish(@Body() { message }: MessageDto): string {
     return this.blowFishService.encrypt(message);
   }
 
-  @Get('decrypt')
-  decryptBlowfish(@Query() { message }: MessageDto): string {
-    let parsedMessage: string;
-    try {
-      parsedMessage = JSON.parse(message);
-    } catch {
-      throw new BadRequestException(
-        'message must be surrounded with double quotes',
-      );
-    }
-    return this.blowFishService.decrypt(parsedMessage);
+  @Post('decrypt')
+  decryptBlowfish(@Body() { message }: MessageDto): string {
+    return this.blowFishService.decrypt(message);
   }
 }
