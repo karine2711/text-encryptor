@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import com.cybersec.encryptor.textencryptor.impl.ECC.EncryptorEllipticCurve.Point;
 
 public class EllipticCurveEncryptor {
+    public static EllipticCurveEncryptor DEFAULT = new EllipticCurveEncryptor(EncryptorEllipticCurve.NUMS_P_384);
     private final static int PADDING = 0xFF;
     private final EncryptorEllipticCurve curve;
 
