@@ -22,6 +22,15 @@ spring:
           uri: http://localhost:3000/blowfish/
           predicates:
             - Path=/blowfish/**
+server:
+  port: 443
+  ssl:
+    key-store-type: JKS
+    key-store: classpath:encrypt-decrypt.jks
+    key-store-password: cybersec23
+    key-password: cybersec23
+    key-alias: cybersec
+
 management:
   endpoints:
     web:
