@@ -28,25 +28,25 @@ public class Caesar {
     private String applyCaesar(String text, int key) {
         return text
             .codePoints()
-            .map(cp -> Character.isUpperCase(cp) ? mapUpperCase(cp + key) : mapLowerCase(cp + key))
+            .map(cp -> Character.isUpperCase(cp) ? mapUpperCase(cp + key) : Character.isLowerCase(cp) ? mapLowerCase(cp + key) : cp)
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();
     }
 
     private int mapLowerCase(int i) {
         if (i > LOWER_CASE_Z) {
-            return (i - LOWER_CASE_Z);
+            return mapLowerCase(i - LOWER_CASE_Z);
         } else if (i < LOWER_CASE_A) {
-            return i + LOWER_CASE_A;
+            return mapLowerCase(i + LOWER_CASE_A);
         }
         return i;
     }
 
     private int mapUpperCase(int i) {
         if (i > UPPER_CASE_Z) {
-            return (i - UPPER_CASE_Z);
+            return mapUpperCase(i - UPPER_CASE_Z);
         } else if (i < UPPER_CASE_A) {
-            return i + UPPER_CASE_A;
+            return mapUpperCase(i + UPPER_CASE_A);
         }
         return i;
     }
