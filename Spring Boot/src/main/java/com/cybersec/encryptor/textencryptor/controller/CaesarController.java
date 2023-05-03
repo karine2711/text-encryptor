@@ -3,6 +3,8 @@ package com.cybersec.encryptor.textencryptor.controller;
 import com.cybersec.encryptor.textencryptor.impl.caesar.Caesar;
 import javax.validation.Valid;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,10 @@ public class CaesarController {
     }
 
     record CaesarDto(@NotBlank(message = "Parameter \"message\" is required!") String message,
-                     @NotBlank(message = "Parameter \"key\" is required!") @Digits(integer = 2, fraction = 0, message = "The key for Caesar algorithm must be an integer!") String key) {
+                     @NotBlank(message = "Parameter \"key\" is required!")
+                     @Digits(integer = 2, fraction = 0, message = "The key for Caesar algorithm must be an integer!")
+                     @Max(value = 25, message = "Key must not be bigger than 25")
+                     @Min(value = 1, message = "Key must be bigger than 0")
+                     String key) {
     }
 }

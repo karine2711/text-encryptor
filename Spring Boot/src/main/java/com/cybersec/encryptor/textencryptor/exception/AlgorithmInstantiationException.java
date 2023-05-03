@@ -1,4 +1,4 @@
-package com.cybersec.encryptor.textencryptor.excpetion;
+package com.cybersec.encryptor.textencryptor.exception;
 
 public class AlgorithmInstantiationException extends RuntimeException{
     public AlgorithmInstantiationException() {

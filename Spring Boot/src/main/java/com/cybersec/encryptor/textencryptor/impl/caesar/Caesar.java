@@ -1,6 +1,6 @@
 package com.cybersec.encryptor.textencryptor.impl.caesar;
 
-import com.cybersec.encryptor.textencryptor.excpetion.AlgorithmInstantiationException;
+import com.cybersec.encryptor.textencryptor.exception.AlgorithmInstantiationException;
 
 public class Caesar {
     public static final int LOWER_CASE_Z = 0x007A;
