@@ -1,9 +1,13 @@
 package com.cybersec.encryptor.textencryptor.impl.aes;
 
-import java.util.Arrays;
-
 public class Matrices {
+
+    private Matrices(){}
+
     public static class Sbox {
+        private Sbox() {
+        }
+
         private static final short[] SBOX = {
             (short) 0x63, (short) 0x7c, (short) 0x77, (short) 0x7b, (short) 0xf2, (short) 0x6b, (short) 0x6f, (short) 0xc5,
             (short) 0x30, (short) 0x01, (short) 0x67, (short) 0x2b, (short) 0xfe, (short) 0xd7, (short) 0xab, (short) 0x76,
@@ -111,6 +115,10 @@ public class Matrices {
     }
 
     public static class ColumnMix {
+
+        private ColumnMix() {
+        }
+
         private static final byte[][] MIX_COLUMNS_MATRIX = {
             {0x02, 0x03, 0x01, 0x01},
             {0x01, 0x02, 0x03, 0x01},
@@ -118,18 +126,6 @@ public class Matrices {
             {0x03, 0x01, 0x01, 0x02}
         };
         private static final byte[][] MIX_COLUMNS_INVERSE_MATRIX = {
-            {0x0E, 0x0B, 0x0D, 0x09},
-            {0x09, 0x0E, 0x0B, 0x0D},
-            {0x0D, 0x09, 0x0E, 0x0B},
-            {0x0B, 0x0D, 0x09, 0x0E}
-        };
-        private static final int[][] MIX_MATRIX = {
-            {0x02, 0x03, 0x01, 0x01},
-            {0x01, 0x02, 0x03, 0x01},
-            {0x01, 0x01, 0x02, 0x03},
-            {0x03, 0x01, 0x01, 0x02}
-        };
-        private static final int[][] INV_MIX_MATRIX = {
             {0x0E, 0x0B, 0x0D, 0x09},
             {0x09, 0x0E, 0x0B, 0x0D},
             {0x0D, 0x09, 0x0E, 0x0B},
@@ -143,60 +139,11 @@ public class Matrices {
         public static void inverseMix(byte[][] stateMatrix) {
             dot(MIX_COLUMNS_INVERSE_MATRIX, stateMatrix);
         }
-
-        public static int[][] mixInt(int[][] state) {
-            int[][] newState = new int[4][4];
-
-            for (int col = 0; col < 4; col++) {
-                newState[0][col] = (MIX_MATRIX[0][0] * state[0][col]) ^ (MIX_MATRIX[0][1] * state[1][col])
-                    ^ (MIX_MATRIX[0][2] * state[2][col]) ^ (MIX_MATRIX[0][3] * state[3][col]);
-                newState[1][col] = (MIX_MATRIX[1][0] * state[0][col]) ^ (MIX_MATRIX[1][1] * state[1][col])
-                    ^ (MIX_MATRIX[1][2] * state[2][col]) ^ (MIX_MATRIX[1][3] * state[3][col]);
-                newState[2][col] = (MIX_MATRIX[2][0] * state[0][col]) ^ (MIX_MATRIX[2][1] * state[1][col])
-                    ^ (MIX_MATRIX[2][2] * state[2][col]) ^ (MIX_MATRIX[2][3] * state[3][col]);
-                newState[3][col] = (MIX_MATRIX[3][0] * state[0][col]) ^ (MIX_MATRIX[3][1] * state[1][col])
-                    ^ (MIX_MATRIX[3][2] * state[2][col]) ^ (MIX_MATRIX[3][3] * state[3][col]);
-            }
-
-            return newState;
-        }
-
-        public static int[][] inverseMixINt(int[][] state) {
-            int[][] newState = new int[4][4];
-
-            for (int col = 0; col < 4; col++) {
-                newState[0][col] = (INV_MIX_MATRIX[0][0] * state[0][col]) ^ (INV_MIX_MATRIX[0][1] * state[1][col])
-                    ^ (INV_MIX_MATRIX[0][2] * state[2][col]) ^ (INV_MIX_MATRIX[0][3] * state[3][col]);
-                newState[1][col] = (INV_MIX_MATRIX[1][0] * state[0][col]) ^ (INV_MIX_MATRIX[1][1] * state[1][col])
-                    ^ (INV_MIX_MATRIX[1][2] * state[2][col]) ^ (INV_MIX_MATRIX[1][3] * state[3][col]);
-                newState[2][col] = (INV_MIX_MATRIX[2][0] * state[0][col]) ^ (INV_MIX_MATRIX[2][1] * state[1][col])
-                    ^ (INV_MIX_MATRIX[2][2] * state[2][col]) ^ (INV_MIX_MATRIX[2][3] * state[3][col]);
-                newState[3][col] = (INV_MIX_MATRIX[3][0] * state[0][col]) ^ (INV_MIX_MATRIX[3][1] * state[1][col])
-                    ^ (INV_MIX_MATRIX[3][2] * state[2][col]) ^ (INV_MIX_MATRIX[3][3] * state[3][col]);
-            }
-
-            return newState;
-        }
-
-        public static void main(String[] args) {
-            byte[][] bb = new byte[][] {
-                {1, 2, 3, 4},
-                {5, 6, 7, 8},
-                {9, 10, 11, 12},
-                {13, 14, 15, 16}
-            };
-            mix(bb);
-            System.out.println(Arrays.deepToString(bb));
-            inverseMix(bb);
-            System.out.println(Arrays.deepToString(bb));
-        }
-
     }
 
 
     public static void dot(byte[][] A, byte[][] B) {
         byte[][] result = new byte[A.length][B[0].length];
-        int[][] unsignedMatrix = toUnsignedMatrix(B);
         for (int i = 0; i < A.length; i++) {
             for (int j = 0; j < B[0].length; j++) {
                 int thisResults = 0;
@@ -212,18 +159,14 @@ public class Matrices {
     private static byte gfMultiply(byte a, byte b) {
         byte product = 0;
         byte mask = 1;
-        byte carry = 0;
         for (int i = 0; i < 8; i++) {
             if ((b & mask) != 0) {
                 product ^= a;
             }
-            carry = (byte) (a & 0x80);
+            byte carry = (byte) (a & 0x80);
             a <<= 1;
             if (carry != 0) {
                 a ^= 0x1B;
-            }
-            if (product >= 256) {
-                product ^= 0x11B;
             }
             mask <<= 1;
         }
@@ -234,7 +177,6 @@ public class Matrices {
         int[][] result = new int[A.length][B[0].length];
         for (int i = 0; i < A.length; i++) {
             for (int j = 0; j < B[0].length; j++) {
-                int thisResults = B[i][j];
                 for (int k = 0; k < A.length; k++) {
                     result[i][j] ^= A[i][k] * B[k][j];
                 }
@@ -255,7 +197,7 @@ public class Matrices {
 
     public static byte[][] constructStateMatrix(byte[] chunk) {
         if (chunk.length != 16) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException("Chunk length must be 16");
         }
         byte[][] matrix = new byte[4][4];
         int i = 0;
